@@ -1,0 +1,3 @@
+C:\Users\NightMoon\Documents\Visual Studio 2017\Projects\MyExample\MyExample\bin\Debug\netstandard2.0\MyExample.deps.json
+C:\Users\NightMoon\Documents\visual studio 2017\Projects\MyExample\MyExample\obj\Debug\netstandard2.0\MyExample.csprojResolveAssemblyReference.cache
+C:\Users\NightMoon\Documents\visual studio 2017\Projects\MyExample\MyExample\obj\Debug\netstandard2.0\MyExample.AssemblyInfo.cs
