@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <Reference Include="Sharp Core API">
-      <HintPath>..\..\..\..\..\Desktop\Sharp.Core.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\Sharp.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 
