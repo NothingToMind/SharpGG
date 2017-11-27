@@ -7,7 +7,6 @@
     using System.Threading.Tasks;
 
     using Sharp.Core.Control;
-    using Sharp.Core.Data.Control.Spell;
     using Sharp.Core.Data.Dependency;
     using Sharp.Core.Data.Event.Server.Game;
     using Sharp.Core.Draw;
@@ -17,6 +16,7 @@
     using Sharp.Core.Event;
     using Sharp.Core.Data.Event.Draw;
     using Sharp.Core.Gui;
+    using Sharp.Core.Server;
     using Sharp.Core.Vector;
 
     #endregion
@@ -28,6 +28,7 @@
         private readonly IEntity Entity;
         private readonly IGui Gui;
         private readonly IDraw Draw;
+        private readonly INavigationMesh NavMesh;
 
         private IAiHeroClient Me;
 
@@ -36,13 +37,14 @@
         private Sharp.Core.Data.Spell.ISpell E;
         private Sharp.Core.Data.Spell.ISpell R;
 
-        public Program(IEvent _event, IControl _control, IEntity _entity, IGui _gui, IDraw _draw)
+        public Program(IEvent _event, IControl _control, IEntity _entity, IGui _gui, IDraw _draw, INavigationMesh _navmesh)
         {
             Event = _event;
             Control = _control;
             Entity = _entity;
             Gui = _gui;
             Draw = _draw;
+            NavMesh = _navmesh;
         }
 
         public Task OnInit()
@@ -53,7 +55,7 @@
             W = Me.SpellBook.W;
             E = Me.SpellBook.E;
             R = Me.SpellBook.R;
-
+            
             InitMenu();
             InitEvent();
 
@@ -67,6 +69,11 @@
 
         private void InitEvent()
         {
+            // 0.01
+            // Event.Server.Game.OnUpdate += OnUpdate;
+            // Event.Draw.OnDraw += OnDraw;
+
+            // 0.02
             Event.Server.Game.OnUpdateSync += OnUpdateSync;
             Event.Draw.OnDrawSync += OnDrawSync;
         }
@@ -77,6 +84,8 @@
             {
                 return;
             }
+
+            // 0.02
 
             try
             {
@@ -278,7 +287,7 @@
                 if (Q.IsReady)
                 {
                     // https://github.com/SharpGG/Core.Examples/blob/master/Core.Examples/AutoAttackRangeDrawer.cs#L41
-                    Draw.Renderer.Render(new Circle(Me.Transform.Position, qRange));
+                    // Draw.Renderer.Render(new Circle(Me.Transform.Position, qRange));
                 }
             }
             catch (InvalidOperationException ex)
@@ -298,19 +307,25 @@
         // Cast On Self
         public void Cast(Sharp.Core.Data.Spell.ISpell spell)
         {
-            Control.Spell.Cast(spell.Data.SpellSlot, new SelfCastSpellConfigurationBase()); // TODO Core fix
+            Control.Spell.Cast(spell.Data.SpellSlot);
         }
 
         // Cast On Position
         public void Cast(Sharp.Core.Data.Spell.ISpell spell, Vector3 Position)
         {
-            Control.Spell.Cast(spell.Data.SpellSlot, new PositionSpellConfigurationBase(Position)); // TODO Core fix
+            Control.Spell.Cast(spell.Data.SpellSlot, Position); // TODO Core fix
+        }
+
+        // Cast On Position
+        public void Cast(Sharp.Core.Data.Spell.ISpell spell, Vector2 Position)
+        {
+            Control.Spell.Cast(spell.Data.SpellSlot, To3D(Position)); // TODO Core fix
         }
 
         // Cast On Target
         public void CastOnUnit(Sharp.Core.Data.Spell.ISpell spell, IIsSpellTargetable target)
         {
-            Control.Spell.Cast(spell.Data.SpellSlot, new TargettedSpellConfigurationBase(target)); // TODO Core fix
+            Control.Spell.Cast(spell.Data.SpellSlot, target); // TODO Core fix
         }
 
         public bool IsRecall(IAiHeroClient player)
@@ -333,6 +348,17 @@
             }
 
             return target.Transform.Position.Distance(Me.Transform.Position);
+        }
+
+        public Vector2 To2D(Vector3 Position)
+        {
+            return new Vector2(Position.X, Position.Y);
+        }
+
+        // TODO should be test it
+        public Vector3 To3D(Vector2 Position)
+        {
+            return new Vector3(Position.X, Position.Y, NavMesh.GetHeightForPosition(Position));
         }
     }
 }
